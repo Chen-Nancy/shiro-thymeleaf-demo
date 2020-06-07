@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nancy.shirothymeleafdemo.mapper.UserMapper">
+    <select id="selectByUsername" resultType="User" parameterType="string">
+        select * from user where username = #{username}
+    </select>
+    <select id="selectByUid" resultType="User" parameterType="int">
+        select * from user where uid = #{uid}
+    </select>
+    <select id="selectUser" resultType="User" parameterType="map">
+        select * from user limit #{start},#{num}
+    </select>
+    <select id="selectAllNum" resultType="java.lang.Integer">
+        select count(*) from user
+    </select>
+    <delete id="deleteByUid" parameterType="int">
+        delete from user where uid = #{uid}
+    </delete>
+    <insert id="insertUser" parameterType="User">
+        insert into user values(null,#{username},#{password},#{phone},#{sex},#{age})
+    </insert>
+    <update id="updateUser" parameterType="User">
+        update user set
+        username = #{username},
+        <if test="password != null and password != ''">
+            password = #{password},
+        </if>
+        phone = #{phone},sex = #{sex},age = #{age}
+        where uid = #{uid}
+    </update>
+</mapper>

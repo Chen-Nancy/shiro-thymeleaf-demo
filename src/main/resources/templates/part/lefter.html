@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Lefter</title>
+</head>
+<body>
+<div th:fragment="lefter">
+    <div class="col-lg-12">
+        <ul class="nav nav-pills nav-stacked">
+            <li role="presentation" th:each="menu:${session.menus}">
+                <a href="javascript:" th:text="${menu.name}" onclick="showOrHide(this)"></a>
+                <ul class="nav nav-pills nav-stacked hide">
+                    <li role="presentation" th:each="perm:${menu.childPerms}">
+                        <a style="margin-left: 20px" th:href="${perm.resource}" th:text="${perm.name}"></a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+    <style>
+        .hide {
+            display: none;
+        }
+
+        .show {
+            display: block;
+        }
+    </style>
+    <script>
+        function showOrHide(_this) {
+            if ($(_this).parent().find("ul").hasClass("hide")) {
+                $(_this).parent().find("ul").removeClass("hide");
+                $(_this).parent().find("ul").addClass("show");
+                $(_this).parent().siblings().each(function () {
+                    $(this).find("ul").removeClass("show");
+                    $(this).find("ul").addClass("hide");
+                })
+            } else {
+                $(_this).parent().find("ul").removeClass("show");
+                $(_this).parent().find("ul").addClass("hide");
+            }
+        }
+    </script>
+</div>
+</body>
+</html>

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>分配权限</title>
+    <link href="/static/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <script src="/static/jquery/jquery.js" type="text/javascript"></script>
+    <script src="/static/bootstrap/js/bootstrap.js" type="text/javascript"></script>
+</head>
+<body>
+<div class="container-fluid row">
+    <div class="top-height row" th:include="part/header::header"></div>
+    <div class="margin-top row">
+        <div class="col-lg-2" th:include="part/lefter::lefter"></div>
+
+        <div class="col-lg-10">
+            <button class="btn btn-info" th:text="${role.name}"></button>
+            <form action="/role/assign" method="post" class="form" id="permForm">
+                <input type="text" name="pageIndex" th:value="${pageIndex}" style="display: none">
+                <input type="number" name="rid" th:value="${role.rid}" style="display: none">
+                <div>
+                    <div class="row" th:each="p1:${perms}">
+                        <hr>
+                        <hr>
+                        <div class="col-lg-12">
+                            <input type="checkbox" name="pid" th:value="${p1.pid}">
+                            <span th:text="${p1.name}"></span>
+                        </div>
+                        <div class="col-lg-12" th:each="p2:${p1.childPerms}">
+                            <hr>
+                            <div class="col-lg-3">
+                                <input type="checkbox" name="pid" th:value="${p2.pid}">
+                                <span th:text="${p2.name}"></span>
+                            </div>
+                            <div class="col-lg-3" th:each="p3:${p2.childPerms}">
+                                <input type="checkbox" name="pid" th:value="${p3.pid}">
+                                <span th:text="${p3.name}"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <input type="submit" class="btn btn-success form-control" value="提交">
+                </div>
+            </form>
+        </div>
+
+    </div>
+</div>
+<script th:inline="javascript">
+    $(function () {
+        var perms = [[${rolePerms}]];
+        if (perms != null) {
+            for (var i = 0; i < perms.length; i++) {
+                $("#permForm").find("div").eq(0).find("input").each(function () {
+                    if ($(this).val() == perms[i].pid) {
+                        $(this).prop("checked", true);
+                    }
+                });
+            }
+        }
+
+        $("#permForm").find("div").eq(0).children().each(function () {
+            var p1 = $(this).find("input").eq(0);
+            p1.click(function () {
+                p1.parent().parent().find("input:gt(0)").each(function () {
+                    if (p1.prop("checked")) {
+                        $(this).prop("checked", true);
+                    } else {
+                        $(this).prop("checked", false);
+                    }
+                })
+            })
+
+            p1.parent().siblings().each(function () {
+                var p2 = $(this).find("input").eq(0);
+                p2.click(function () {
+                    if (p2.prop("checked")) {
+                        p2.parent().parent().siblings("div").eq(0).find("input").eq(0).prop("checked", true);
+                    }
+                    p2.parent().parent().find("input:gt(0)").each(function () {
+                        if (p2.prop("checked")) {
+                            $(this).prop("checked", true);
+                        } else {
+                            $(this).prop("checked", false);
+                        }
+                    })
+                })
+
+                p2.parent().siblings().each(function () {
+                    var p3 = $(this).find("input").eq(0);
+                    p3.click(function () {
+                        if (p3.prop("checked")) {
+                            p3.parent().siblings("div").eq(0).find("input").eq(0).prop("checked", true);
+                            p3.parent().parent().siblings("div").eq(0).find("input").eq(0).prop("checked", true);
+                        }
+                    })
+                })
+            })
+        })
+    });
+</script>
+</body>
+</html>

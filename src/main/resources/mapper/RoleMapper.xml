@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nancy.shirothymeleafdemo.mapper.RoleMapper">
+    <select id="selectByRid" resultType="Role" parameterType="int">
+        select * from role where rid = #{rid}
+    </select>
+    <select id="selectAllRoles" resultType="Role">
+        select * from role
+    </select>
+    <select id="selectRolesByUid" resultType="Role" parameterType="int">
+        select * from ur
+        left join role r on ur.rid = r.rid
+        where ur.uid = #{uid}
+    </select>
+    <delete id="deleteUserRoleByUid" parameterType="int">
+        delete from ur where uid = #{uid}
+    </delete>
+    <insert id="insertUserRole" parameterType="map">
+        insert into ur values
+        <foreach collection="rids" item="rid" separator=",">
+            (null,#{uid},#{rid})
+        </foreach>
+    </insert>
+    <select id="selectRole" resultType="Role" parameterType="map">
+        select * from role limit #{start},#{num}
+    </select>
+    <select id="selectAllNum" resultType="java.lang.Integer">
+        select count(*) from role
+    </select>
+    <delete id="deleteByRid" parameterType="int">
+        delete from role where rid = #{rid}
+    </delete>
+    <delete id="deleteUserRoleByRid" parameterType="int">
+        delete from ur where rid = #{rid}
+    </delete>
+    <insert id="insertRole" parameterType="Role">
+        insert into role values(null,#{name})
+    </insert>
+    <update id="updateRole" parameterType="User">
+        update role set `name` = #{name} where rid = #{rid}
+    </update>
+</mapper>

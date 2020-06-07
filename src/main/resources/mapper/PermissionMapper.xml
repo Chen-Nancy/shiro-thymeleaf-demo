@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nancy.shirothymeleafdemo.mapper.PermissionMapper">
+    <resultMap id="baseMap" type="Permission">
+        <id property="pid" column="pid"/>
+        <result property="name" column="name"/>
+        <result property="resource" column="resource"/>
+        <result property="level" column="level"/>
+        <result property="parentId" column="parent_id"/>
+    </resultMap>
+    <resultMap id="permsMap" type="Permission">
+        <id property="pid" column="pid1"/>
+        <result property="name" column="name1"/>
+        <result property="resource" column="resource1"/>
+        <result property="parentId" column="parent_id1"/>
+        <result property="level" column="level1"/>
+        <collection property="childPerms" ofType="Permission">
+            <id property="pid" column="pid2"/>
+            <result property="name" column="name2"/>
+            <result property="resource" column="resource2"/>
+            <result property="parentId" column="parent_id2"/>
+            <result property="level" column="level2"/>
+            <collection property="childPerms" ofType="Permission">
+                <id property="pid" column="pid3"/>
+                <result property="name" column="name3"/>
+                <result property="resource" column="resource3"/>
+                <result property="parentId" column="parent_id3"/>
+                <result property="level" column="level3"/>
+            </collection>
+        </collection>
+    </resultMap>
+
+    <select id="selectMenu" resultMap="permsMap" parameterType="int">
+        select
+        p1.pid pid2,p1.name name2,p1.resource resource2,p1.level level2,p1.parent_id parent_id2,
+        p2.pid pid1,p2.name name1,p2.resource resource1,p2.level level1,p2.parent_id parent_id1
+        from ur
+        left join rp on ur.rid = rp.rid
+        left join permission p1 on rp.pid = p1.pid
+        left join permission p2 on p1.parent_id = p2.pid
+        where ur.uid = #{uid} and p1.level = 1
+    </select>
+    <select id="selectPermsByUid" resultMap="baseMap" parameterType="int">
+        select p.* from ur
+        left join rp on ur.rid = rp.rid
+        left join permission p on rp.pid = p.pid
+        where ur.uid = #{uid} and p.level > 0
+    </select>
+    <select id="selectAllPerms" resultMap="permsMap">
+        select
+        p1.pid pid1,p1.name name1,p1.resource resource1,p1.parent_id parent_id1,p1.level level1,
+        p2.pid pid2,p2.name name2,p2.resource resource2,p2.parent_id parent_id2,p2.level level2,
+        p3.pid pid3,p3.name name3,p3.resource resource3,p3.parent_id parent_id3,p3.level level3
+        from permission p1
+        left join permission p2 on p1.pid = p2.parent_id
+        left join permission p3 on p2.pid = p3.parent_id
+        where p1.level = 0
+    </select>
+    <select id="selectPermsByRid" resultMap="baseMap" parameterType="int">
+        select * from rp
+        left join permission p on rp.pid = p.pid
+        where rp.rid = #{rid}
+    </select>
+    <delete id="deleteRolePermByRid" parameterType="int">
+        delete from rp where rid = #{rid}
+    </delete>
+    <insert id="insertRolePerm" parameterType="map">
+        insert into rp values
+        <foreach collection="pids" item="pid" separator=",">
+            (null,#{rid},#{pid})
+        </foreach>
+    </insert>
+</mapper>
